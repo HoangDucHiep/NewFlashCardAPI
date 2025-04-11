@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "IDjqcLjFeJUYPYYuuBDOM4zneUycy8hSx5yvtNfMrig=",
+  "Source": "FlashcardApi.Presentation",
+  "BasePath": "_content/FlashcardApi.Presentation",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

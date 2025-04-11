@@ -1,0 +1,24 @@
+### Register a new user
+POST https://localhost:7198/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+### Login with the registered user
+POST https://localhost:7198/api/Auth/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+### Get current user info (requires token from login)
+GET https://localhost:7198/api/Auth/me
+Authorization: Bearer {{token}}
+
+### Variables
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFiOGQ1NzFkLTY1NzUtNGE3NC05NjlmLTJlMDFhOWI2NmU2OCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ0ZXN0dXNlciIsImV4cCI6MTc0NDQ2MjM2NywiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE5OCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgifQ.ZXSjSlAhm7hgyyz_45A4CO5TjZn6YIEYqVzOXN1_6uY

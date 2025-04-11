@@ -1,0 +1,157 @@
+@insecure
+
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFiOGQ1NzFkLTY1NzUtNGE3NC05NjlmLTJlMDFhOWI2NmU2OCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ0ZXN0dXNlciIsImV4cCI6MTc0NDM5NDAzNCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE5OCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgifQ.pZ12DUgCef1UnxhuJ8LtsPLiqa47JNbxOaZUL7PGklk
+
+### Register a new user
+POST https://localhost:7198/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+### Login and save token
+POST https://localhost:7198/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+
+### Get current user info
+GET https://localhost:7198/api/auth/me
+Authorization: Bearer {{auth_token}}
+
+### Logout
+POST https://localhost:7198/api/auth/logout
+Authorization: Bearer {{auth_token}}
+
+### Get current user (after logout - should fail)
+GET https://localhost:7198/api/auth/me
+Authorization: Bearer {{auth_token}}
+
+### Create a folder
+POST https://localhost:7198/api/folder
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "Name": "test api",
+    "ParentFolderId": null,
+    "CreatedAt": "2025-04-11T00:00:00",
+    "LastModified": "2025-04-11T00:00:00"
+}
+
+### Get user folders
+GET https://localhost:7198/api/folder
+Authorization: Bearer {{auth_token}}
+
+### Update a folder
+@folder_id = c9a8d1b2-b90b-4ba7-a036-b24c2542f08b
+PUT https://localhost:7198/api/folder/{{folder_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "UpdatedFolder",
+    "parentFolderId": null
+}
+
+### Delete a folder
+DELETE https://localhost:7198/api/folder/{{folder_id}}
+Authorization: Bearer {{auth_token}}
+
+### Create a desk
+POST https://localhost:7198/api/desk
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "MyDesk",
+    "isPublic": true,
+    "folderId": "f3665772-b4c8-46ff-bc8e-53c056487cb4"
+}
+
+### Get user desks
+GET https://localhost:7198/api/desk
+Authorization: Bearer {{auth_token}}
+
+### Get public desks
+GET https://localhost:7198/api/desk/public
+
+### Update a desk
+PUT https://localhost:7198/api/desk/{{desk_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "UpdatedDesk",
+    "isPublic": false,
+    "folderId": "f3665772-b4c8-46ff-bc8e-53c056487cb4"
+}
+
+### Clone a desk
+POST https://localhost:7198/api/desk/{{desk_id}}/clone
+Authorization: Bearer {{auth_token}}
+
+### Delete a desk
+DELETE https://localhost:7198/api/desk/{{desk_id}}
+Authorization: Bearer {{auth_token}}
+
+### Create a card
+POST https://localhost:7198/api/card
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "deskId": "{{desk_id}}",
+    "front": "What is 2+2?",
+    "back": "4"
+}
+
+> {% 
+    client.global.set("card_id", response.body.id);
+%}
+
+### Get cards by deskId
+GET https://localhost:7198/api/card?deskId={{desk_id}}
+Authorization: Bearer {{auth_token}}
+
+### Update a card
+PUT https://localhost:7198/api/card/{{card_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "deskId": "{{desk_id}}",
+    "front": "What is 3+3?",
+    "back": "6"
+}
+
+### Delete a card
+DELETE https://localhost:7198/api/card/{{card_id}}
+Authorization: Bearer {{auth_token}}
+
+### Upload an image
+POST https://localhost:7198/api/image/upload
+Authorization: Bearer {{auth_token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.jpg"
+Content-Type: image/jpeg
+
+< ./test.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+> {% 
+    client.global.set("image_id", response.body.id);
+%}
+
+### Delete an image
+DELETE https://localhost:7198/api/image/{{image_id}}
+Authorization: Bearer {{auth_token}}
+

@@ -1,0 +1,12 @@
+D:\NewFlashCardAPI\FlashcardApi.Domain\bin\Debug\net9.0\FlashcardApi.Domain.deps.json
+D:\NewFlashCardAPI\FlashcardApi.Domain\bin\Debug\net9.0\FlashcardApi.Domain.dll
+D:\NewFlashCardAPI\FlashcardApi.Domain\bin\Debug\net9.0\FlashcardApi.Domain.pdb
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.csproj.AssemblyReference.cache
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.AssemblyInfoInputs.cache
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.AssemblyInfo.cs
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.csproj.CoreCompileInputs.cache
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.dll
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\refint\FlashcardApi.Domain.dll
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.pdb
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\ref\FlashcardApi.Domain.dll

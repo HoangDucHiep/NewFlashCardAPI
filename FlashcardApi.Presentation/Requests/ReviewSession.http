@@ -1,0 +1,125 @@
+@insecure
+
+### Register a new user
+POST https://localhost:7198/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+### Login and save token
+POST https://localhost:7198/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "Password123!"
+}
+
+
+### Create a desk (to get deskId)
+POST https://localhost:7198/api/desk
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "name": "TestDesk",
+    "isPublic": false,
+    "folderId": null
+}
+
+
+### Create a card (to get cardId)
+POST https://localhost:7198/api/card
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "deskId": "81e3518b-364b-4759-866c-324d0d561547",
+    "front": "What is 2+2?",
+    "back": "4"
+}
+
+
+### Create a review
+POST https://localhost:7198/api/review
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "cardId": "0c87fa0d-bd38-49fd-bdd9-344559f29724",
+    "ease": 2.5,
+    "interval": 1,
+    "repetition": 0,
+    "nextReviewDate": "2025-04-10",
+    "lastReviewed": "2025-04-09"
+}
+
+
+### Update a review
+PUT https://localhost:7198/api/review/{{review_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "cardId": "{{card_id}}",
+    "ease": 2.8,
+    "interval": 2,
+    "repetition": 1,
+    "nextReviewDate": "2025-04-11",
+    "lastReviewed": "2025-04-10"
+}
+
+### Get review by cardId
+GET https://localhost:7198/api/review/card/0c87fa0d-bd38-49fd-bdd9-344559f29724
+Authorization: Bearer {{auth_token}}
+
+### Get reviews due today
+GET https://localhost:7198/api/review/due-today?deskId=81e3518b-364b-4759-866c-324d0d561547&today=2025-04-09
+Authorization: Bearer {{auth_token}}
+
+### Delete a review
+DELETE https://localhost:7198/api/review/{{review_id}}
+Authorization: Bearer {{auth_token}}
+
+### Create a session
+POST https://localhost:7198/api/session
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "deskId": "{{desk_id}}",
+    "startTime": "2025-04-09T10:00:00",
+    "endTime": "2025-04-09T10:30:00",
+    "cardsStudied": 5,
+    "performance": 80.0
+}
+
+> {% 
+    client.global.set("session_id", response.body.id);
+%}
+
+### Update a session
+PUT https://localhost:7198/api/session/{{session_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+    "deskId": "{{desk_id}}",
+    "startTime": "2025-04-09T10:00:00",
+    "endTime": "2025-04-09T11:00:00",
+    "cardsStudied": 10,
+    "performance": 90.0
+}
+
+### Get sessions by deskId
+GET https://localhost:7198/api/session/desk/{{desk_id}}
+Authorization: Bearer {{auth_token}}
+
+### Delete a session
+DELETE https://localhost:7198/api/session/{{session_id}}
+Authorization: Bearer {{auth_token}}
+
+@auth_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImFiOGQ1NzFkLTY1NzUtNGE3NC05NjlmLTJlMDFhOWI2NmU2OCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ0ZXN0dXNlciIsImV4cCI6MTc0NDM0MzA2MCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE5OCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgifQ.9eCOy6S7u3sR4J1TF-ZqZ1KpfJ3PkKIHGa2VYRDgyg4
