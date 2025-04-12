@@ -29,6 +29,7 @@ public class CardController : ControllerBase
     public async Task<IActionResult> CreateCard([FromBody] CardDto cardDto)
     {
         var card = await _cardService.CreateCardAsync(cardDto);
+        await _cardService.CleanupUnusedImagesAsync(cardDto.DeskId, cardDto.ImagePaths);
         return Ok(card);
     }
 
@@ -38,6 +39,7 @@ public class CardController : ControllerBase
         try
         {
             var updatedCard = await _cardService.UpdateCardAsync(id, cardDto);
+            await _cardService.CleanupUnusedImagesAsync(cardDto.DeskId, cardDto.ImagePaths);
             return Ok(updatedCard);
         }
         catch (Exception ex)

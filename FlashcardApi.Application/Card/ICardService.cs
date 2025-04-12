@@ -8,4 +8,6 @@ public interface ICardService
     Task<CardDto> CreateCardAsync(CardDto cardDto);
     Task<CardDto> UpdateCardAsync(string id, CardDto cardDto);
     Task DeleteCardAsync(string id);
+    Task CleanupUnusedImagesAsync(string deskId, List<string> usedImagePaths);
+
 }

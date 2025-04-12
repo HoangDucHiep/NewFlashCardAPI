@@ -20,22 +20,24 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("upload")]
-    public async Task<IActionResult> UploadImage(IFormFile file)
+    public async Task<IActionResult> UploadImage(IFormFile file, [FromQuery] string fileName)
     {
         if (file == null || file.Length == 0)
             return BadRequest(new { message = "No file uploaded" });
+        if (string.IsNullOrEmpty(fileName))
+            return BadRequest(new { message = "File name is required" });
 
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var image = await _imageService.UploadImageAsync(userId, file);
+        var image = await _imageService.UploadImageAsync(userId, file, fileName);
         return Ok(image);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteImage(string id)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteImage([FromQuery] string fileName)
     {
         try
         {
-            await _imageService.DeleteImageAsync(id);
+            await _imageService.DeleteImageAsync(fileName);
             return Ok(new { message = "Image deleted successfully" });
         }
         catch (Exception ex)

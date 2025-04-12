@@ -1,6 +1,7 @@
 using FlashcardApi.Domain.Entities;
 using FlashcardApi.Domain.Interfaces;
 using FlashcardApi.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlashcardApi.Infrastructure.Repositories;
 
@@ -28,5 +29,15 @@ public class ImageRepository : IImageRepository
             _context.Images.Remove(image);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<Image> GetByFileNameAsync(string fileName)
+    {
+        return await _context.Images.FirstOrDefaultAsync(i => i.Url.EndsWith(fileName));
+    }
+
+    public async Task<List<Image>> GetAllAsync()
+    {
+        return await _context.Images.ToListAsync();
     }
 }
