@@ -15,3 +15,4 @@ D:\NewFlashCardAPI\FlashcardApi.Infrastructure\obj\Debug\net9.0\FlashcardApi.Inf
 D:\NewFlashCardAPI\FlashcardApi.Infrastructure\obj\Debug\net9.0\refint\FlashcardApi.Infrastructure.dll
 D:\NewFlashCardAPI\FlashcardApi.Infrastructure\obj\Debug\net9.0\FlashcardApi.Infrastructure.pdb
 D:\NewFlashCardAPI\FlashcardApi.Infrastructure\obj\Debug\net9.0\ref\FlashcardApi.Infrastructure.dll
+D:\NewFlashCardAPI\FlashcardApi.Infrastructure\obj\Debug\net9.0\FlashcardApi.Infrastructure.sourcelink.json

@@ -26,6 +26,15 @@ public class DeskController : ControllerBase
         return Ok(desks);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDeskById(string id)
+    {
+        var desk = await _deskService.GetDeskByIdAsync(id);
+        if (desk == null)
+            return NotFound(new { message = "Desk not found" });
+        return Ok(desk);
+    }
+
     [HttpGet("public")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPublicDesks()

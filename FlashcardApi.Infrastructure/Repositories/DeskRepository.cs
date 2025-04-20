@@ -24,7 +24,7 @@ public class DeskRepository : IDeskRepository
         return await _context.Desks.Where(d => d.IsPublic).ToListAsync();
     }
 
-    public async Task<Desk> GetByIdAsync(string id)
+    public async Task<Desk?> GetByIdAsync(string id)
     {
         return await _context.Desks.FindAsync(id);
     }

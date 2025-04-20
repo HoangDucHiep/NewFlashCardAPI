@@ -102,7 +102,7 @@ public class CardService : ICardService
         }
 
         // Xác định ảnh không còn dùng
-        var allImages = await _imageRepository.GetAllAsync(); // Giả định có phương thức này
+        var allImages = await _imageRepository.GetAllAsync(); 
         foreach (var image in allImages)
         {
             string fileName = Path.GetFileName(image.Url);
@@ -118,9 +118,9 @@ public class CardService : ICardService
         var imagePaths = new List<string>();
         string combinedHtml = (front ?? "") + (back ?? "");
         var matches = Regex.Matches(combinedHtml, @"<img[^>]+src=[""'](.*?)[""'][^>]*>");
-        foreach (Match match in matches) // Chỉ định kiểu Match thay vì var
+        foreach (Match match in matches)
         {
-            string src = match.Groups[1].Value; // Groups[1] là phần trong dấu ngoặc đơn của regex
+            string src = match.Groups[1].Value;
             string fileName = Path.GetFileName(src);
             if (!string.IsNullOrEmpty(fileName))
                 imagePaths.Add(fileName);

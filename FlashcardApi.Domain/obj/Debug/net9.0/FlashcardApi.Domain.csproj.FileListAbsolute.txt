@@ -10,3 +10,4 @@ D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.dll
 D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\refint\FlashcardApi.Domain.dll
 D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.pdb
 D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\ref\FlashcardApi.Domain.dll
+D:\NewFlashCardAPI\FlashcardApi.Domain\obj\Debug\net9.0\FlashcardApi.Domain.sourcelink.json

@@ -9,11 +9,20 @@ public class DeskService : IDeskService
 {
     private readonly IDeskRepository _deskRepository;
     private readonly ICardRepository _cardRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly IReviewRepository _reviewRepository; // Giả sử bạn đã inject IReviewRepository
 
-    public DeskService(IDeskRepository deskRepository, ICardRepository cardRepository)
+    public DeskService(
+        IDeskRepository deskRepository,
+        ICardRepository cardRepository,
+        IUserRepository userRepository,
+        IReviewRepository reviewRepository
+    )
     {
         _deskRepository = deskRepository;
         _cardRepository = cardRepository;
+        _userRepository = userRepository;
+        _reviewRepository = reviewRepository;
     }
 
     public async Task<List<DeskDto>> GetUserDesksAsync(string userId)
@@ -32,18 +41,34 @@ public class DeskService : IDeskService
             .ToList();
     }
 
-    public async Task<List<DeskDto>> GetPublicDesksAsync()
+    public async Task<DeskDto?> GetDeskByIdAsync(string id)
+    {
+        var desk = await _deskRepository.GetByIdAsync(id);
+        if (desk == null)
+            return null;
+
+        return new DeskDto
+        {
+            Id = desk.Id,
+            Name = desk.Name,
+            IsPublic = desk.IsPublic,
+            FolderId = desk.FolderId,
+            CreatedAt = desk.CreatedAt,
+            LastModified = desk.LastModified,
+        };
+    }
+
+    public async Task<List<PublicDeskDto>> GetPublicDesksAsync()
     {
         var desks = await _deskRepository.GetPublicDesksAsync();
+
         return desks
-            .Select(d => new DeskDto
+            .Select(d => new PublicDeskDto
             {
                 Id = d.Id,
                 Name = d.Name,
-                IsPublic = d.IsPublic,
-                FolderId = d.FolderId,
-                CreatedAt = d.CreatedAt,
-                LastModified = d.LastModified,
+                Owner = _userRepository.FindByIdAsync(d.OwnerId).Result?.UserName ?? "Unknown",
+                CardCount = _cardRepository.GetByDeskIdAsync(d.Id).Result.Count,
             })
             .ToList();
     }
@@ -126,6 +151,17 @@ public class DeskService : IDeskService
                 Back = card.Back,
             };
             await _cardRepository.AddAsync(clonedCard);
+
+            var newReview = new Review
+            {
+                CardId = clonedCard.Id,
+                Ease = 2.5,
+                Interval = 0,
+                Repetition = 0,
+                NextReviewDate = DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+                LastReviewed = null,
+            };
+            await _reviewRepository.CreateAsync(newReview); // Giả sử bạn đã inject IReviewRepository
         }
 
         return new DeskDto
