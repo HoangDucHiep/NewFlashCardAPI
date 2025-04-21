@@ -1,0 +1,201 @@
+### Base URL
+@baseUrl = http://0.0.0.0:5029
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjBjZDc4MmIwLTJkMDQtNDdkYy05Y2EwLTJmNWU3ZGFmOTNlZiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ0ZXN0dXNlciIsImV4cCI6MTc0NTM0MTM5OSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE5OCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgifQ.IK5GshIpicaXM8AEKJ8PpPwG07L6OYUceLV4ixsp8wo
+
+
+### Lấy danh sách folder của người dùng
+GET {{baseUrl}}/Uploads/img_1745251293830.jpg
+Authorization: Bearer {{token}}
+
+### Tạo folder mới
+POST {{baseUrl}}/api/folder
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "My Folder",
+  "parentFolderId": null
+}
+
+### get nested folders
+GET {{baseUrl}}/api/folder/nested
+Authorization: Bearer {{token}}
+
+### Cập nhật folder
+PUT {{baseUrl}}/api/folder/626a9ca5-1562-4c83-b4be-50a825ab6235
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Folder",
+  "parentFolderId": null
+}
+
+### Xóa folder
+DELETE {{baseUrl}}/api/folder/626a9ca5-1562-4c83-b4be-50a825ab6235
+Authorization: Bearer {{token}}
+
+### Lấy danh sách desk của người dùng
+GET {{baseUrl}}/api/desk
+Authorization: Bearer {{token}}
+
+### Lấy desk theo ID
+GET {{baseUrl}}/api/desk/{{deskId}}
+Authorization: Bearer {{token}}
+
+### Lấy danh sách desk public
+GET {{baseUrl}}/api/desk/public
+
+### Tạo desk mới
+POST {{baseUrl}}/api/desk
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "My Desk",
+  "isPublic": true,
+  "folderId": "0f4c060e-2b46-4cd4-a060-7d1443a7f662"
+}
+
+### Cập nhật desk
+PUT {{baseUrl}}/api/desk/{{deskId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Desk",
+  "isPublic": false,
+  "folderId": "{{folderId}}"
+}
+
+### Xóa desk
+DELETE {{baseUrl}}/api/desk/be55e183-9bb0-4e50-b850-0e87d7636be2
+Authorization: Bearer {{token}}
+
+### Clone desk public
+POST {{baseUrl}}/api/desk/{{deskId}}/clone?targetFolderId={{folderId}}
+Authorization: Bearer {{token}}
+
+### Lấy danh sách card theo desk
+GET {{baseUrl}}/api/card?deskId=e4d66c2d-6788-4cbb-975b-18f0e32a8024
+Authorization: Bearer {{token}}
+
+GET {{baseUrl}}/api/card/new
+Authorization: Bearer {{token}}
+
+### Tạo card mới
+POST {{baseUrl}}/api/card
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "deskId": "e4d66c2d-6788-4cbb-975b-18f0e32a8024",
+    "front": "<p>Card front with image: <img src=\"/Uploads/test.png\" alt=\"Test Image\"></p>",
+    "back": "<p>Card back</p>"
+}
+
+### Cập nhật card
+PUT {{baseUrl}}/api/card/742a464c-f83c-4c20-a818-5b824f630ff0
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "deskId": "e4d66c2d-6788-4cbb-975b-18f0e32a8024",
+    "front": "<p>Card updatedupdated front without image:</p>",
+    "back": "<p>Card back</p>"
+}
+
+### Xóa card
+DELETE {{baseUrl}}/api/card/c9eb6c9d-f0b7-46d2-93a0-1912540b3a81
+Authorization: Bearer {{token}}
+
+### Upload hình ảnh
+POST {{baseUrl}}/api/image/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Authorization: Bearer {{token}}
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.png"
+Content-Type: image/png
+
+< ./test.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Xóa hình ảnh
+DELETE {{baseUrl}}/api/image/{{fileName}}
+Authorization: Bearer {{token}}
+
+### Tạo review
+POST {{baseUrl}}/api/review
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "cardId": "{{cardId}}",
+  "ease": 2.5,
+  "interval": 0,
+  "repetition": 0,
+  "nextReviewDate": "2025-04-21T00:00:00.000",
+  "lastReviewed": null
+}
+
+### Cập nhật review
+PUT {{baseUrl}}/api/review/{{reviewId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "cardId": "{{cardId}}",
+  "ease": 2.8,
+  "interval": 1,
+  "repetition": 1,
+  "nextReviewDate": "2025-04-22T00:00:00.000",
+  "lastReviewed": "2025-04-21T00:00:00.000"
+}
+
+### Xóa review
+DELETE {{baseUrl}}/api/review/{{reviewId}}
+Authorization: Bearer {{token}}
+
+### Lấy review theo card
+GET {{baseUrl}}/api/review/card/{{cardId}}
+Authorization: Bearer {{token}}
+
+### Lấy review due today
+GET {{baseUrl}}/api/review/due-today?deskId={{deskId}}&today=2025-04-21T00:00:00.000
+Authorization: Bearer {{token}}
+
+### Tạo session
+POST {{baseUrl}}/api/session
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "deskId": "{{deskId}}",
+  "startTime": "2025-04-21T10:00:00.000",
+  "endTime": null,
+  "cardsStudied": 0,
+  "performance": 0.0
+}
+
+### Cập nhật session
+PUT {{baseUrl}}/api/session/{{sessionId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "deskId": "{{deskId}}",
+  "startTime": "2025-04-21T10:00:00.000",
+  "endTime": "2025-04-21T11:00:00.000",
+  "cardsStudied": 10,
+  "performance": 0.85
+}
+
+### Xóa session
+DELETE {{baseUrl}}/api/session/{{sessionId}}
+Authorization: Bearer {{token}}
+
+### Lấy danh sách session theo desk
+GET {{baseUrl}}/api/session/desk/{{deskId}}
+Authorization: Bearer {{token}}

@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using FlashcardApi.Application.Card;
 using FlashcardApi.Application.Card.Dtos;
+using FlashcardApi.Application.Image;
 using FlashcardApi.Domain.Entities;
 using FlashcardApi.Domain.Interfaces;
 
@@ -9,31 +10,29 @@ namespace FlashcardApi.Infrastructure.Services;
 public class CardService : ICardService
 {
     private readonly ICardRepository _cardRepository;
-    private readonly IImageRepository _imageRepository;
+    private readonly IImageService _imageService;
+    private readonly IReviewRepository _reviewRepository;
 
-    public CardService(ICardRepository cardRepository, IImageRepository imageRepository)
+    public CardService(ICardRepository cardRepository, IReviewRepository reviewRepository, IImageService imageService)
     {
+        _imageService = imageService;
         _cardRepository = cardRepository;
-        _imageRepository = imageRepository;
+        _reviewRepository = reviewRepository;
     }
-
-    
 
     public async Task<List<CardDto>> GetCardsByDeskIdAsync(string deskId)
     {
         var cards = await _cardRepository.GetByDeskIdAsync(deskId);
-        return cards
-            .Select(c => new CardDto
-            {
-                Id = c.Id,
-                DeskId = c.DeskId,
-                Front = c.Front,
-                Back = c.Back,
-                ImagePaths = ExtractImagePaths(c.Front, c.Back), // Trích xuất từ HTML
-                CreatedAt = c.CreatedAt,
-                LastModified = c.LastModified,
-            })
-            .ToList();
+        return cards.Select(c => new CardDto
+        {
+            Id = c.Id,
+            DeskId = c.DeskId,
+            Front = c.Front,
+            Back = c.Back,
+            ImagePaths = ExtractImagePaths(c.Front, c.Back),
+            CreatedAt = c.CreatedAt,
+            LastModified = c.LastModified
+        }).ToList();
     }
 
     public async Task<CardDto> CreateCardAsync(CardDto cardDto)
@@ -42,89 +41,121 @@ public class CardService : ICardService
         {
             DeskId = cardDto.DeskId,
             Front = cardDto.Front,
-            Back = cardDto.Back,
+            Back = cardDto.Back
         };
-        await _cardRepository.AddAsync(card);
+        var createdCard = await _cardRepository.AddAsync(card);
+
+        // Tạo review mặc định
+        var review = new Review
+        {
+            CardId = createdCard.Id,
+            Ease = 2.5,
+            Interval = 0,
+            Repetition = 0,
+            NextReviewDate = DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+            LastReviewed = null
+        };
+        await _reviewRepository.CreateAsync(review);
+
         return new CardDto
         {
-            Id = card.Id,
-            DeskId = card.DeskId,
-            Front = card.Front,
-            Back = card.Back,
-            ImagePaths = cardDto.ImagePaths, // Giữ nguyên danh sách từ client
-            CreatedAt = card.CreatedAt,
-            LastModified = card.LastModified,
+            Id = createdCard.Id,
+            DeskId = createdCard.DeskId,
+            Front = createdCard.Front,
+            Back = createdCard.Back,
+            ImagePaths = ExtractImagePaths(createdCard.Front, createdCard.Back),
+            CreatedAt = createdCard.CreatedAt,
+            LastModified = createdCard.LastModified
         };
     }
 
     public async Task<CardDto> UpdateCardAsync(string id, CardDto cardDto)
     {
         var card = await _cardRepository.GetByIdAsync(id);
-        if (card == null)
-            throw new Exception("Card not found");
+        if (card == null) throw new Exception("Card not found");
 
+        var oldImagePaths = ExtractImagePaths(card.Front, card.Back);
         card.Front = cardDto.Front;
         card.Back = cardDto.Back;
         card.LastModified = DateTime.UtcNow;
-
         await _cardRepository.UpdateAsync(card);
+
+        var newImagePaths = ExtractImagePaths(card.Front, card.Back);
+        var unusedImages = oldImagePaths.Except(newImagePaths).ToList();
+        foreach (var fileName in unusedImages)
+        {
+            await _imageService.DeleteImageAsync(fileName); // Sử dụng ImageService thay vì ImageRepository
+        }
+
         return new CardDto
         {
             Id = card.Id,
             DeskId = card.DeskId,
             Front = card.Front,
             Back = card.Back,
-            ImagePaths = cardDto.ImagePaths, // Giữ nguyên danh sách từ client
+            ImagePaths = newImagePaths,
             CreatedAt = card.CreatedAt,
-            LastModified = card.LastModified,
+            LastModified = card.LastModified
         };
     }
 
-    public async Task DeleteCardAsync(string id)
+    public async Task<bool> DeleteCardAsync(string id)
     {
         var card = await _cardRepository.GetByIdAsync(id);
-        if (card == null)
-            throw new Exception("Card not found");
+        if (card == null) return false;
 
-        await _cardRepository.DeleteAsync(id);
-    }
-
-    public async Task CleanupUnusedImagesAsync(string deskId, List<string> usedImagePaths)
-    {
-        var allCards = await _cardRepository.GetByDeskIdAsync(deskId);
-        var allUsedImagePaths = new HashSet<string>();
-
-        // Thu thập tất cả ảnh đang dùng trong Desk
-        foreach (var card in allCards)
+        var imagePaths = ExtractImagePaths(card.Front, card.Back);
+        var deleted = await _cardRepository.DeleteAsync(id);
+        if (deleted)
         {
-            var imagePaths = ExtractImagePaths(card.Front, card.Back);
-            allUsedImagePaths.UnionWith(imagePaths);
-        }
-
-        // Xác định ảnh không còn dùng
-        var allImages = await _imageRepository.GetAllAsync(); 
-        foreach (var image in allImages)
-        {
-            string fileName = Path.GetFileName(image.Url);
-            if (!allUsedImagePaths.Contains(fileName))
+            foreach (var fileName in imagePaths)
             {
-                await _imageRepository.DeleteAsync(image.Id);
+                await _imageService.DeleteImageAsync(fileName); // Gọi ImageService thay vì ImageRepository
             }
         }
+        return deleted;
     }
 
     private List<string> ExtractImagePaths(string front, string back)
     {
         var imagePaths = new List<string>();
         string combinedHtml = (front ?? "") + (back ?? "");
-        var matches = Regex.Matches(combinedHtml, @"<img[^>]+src=[""'](.*?)[""'][^>]*>");
+        var matches = Regex.Matches(combinedHtml, @"<img[^>]+src=[""']/Uploads/(.*?)[""'][^>]*>");
         foreach (Match match in matches)
         {
-            string src = match.Groups[1].Value;
-            string fileName = Path.GetFileName(src);
-            if (!string.IsNullOrEmpty(fileName))
-                imagePaths.Add(fileName);
+            string fileName = match.Groups[1].Value;
+            if (!string.IsNullOrEmpty(fileName)) imagePaths.Add(fileName);
         }
         return imagePaths;
+    }
+
+    public async Task<List<CardDto>> GetNewCardsAsync(string deskId)
+    {
+        var cards = await _cardRepository.GetNewCardsAsync(deskId);
+        return cards.Select(c => new CardDto
+        {
+            Id = c.Id,
+            DeskId = c.DeskId,
+            Front = c.Front,
+            Back = c.Back,
+            ImagePaths = ExtractImagePaths(c.Front, c.Back),
+            CreatedAt = c.CreatedAt,
+            LastModified = c.LastModified
+        }).ToList();
+    }
+
+    public async Task<List<CardDto>> GetCardsDueTodayAsync(string deskId, string today)
+    {
+        var cards = await _cardRepository.GetCardsDueTodayAsync(deskId, today);
+        return cards.Select(c => new CardDto
+        {
+            Id = c.Id,
+            DeskId = c.DeskId,
+            Front = c.Front,
+            Back = c.Back,
+            ImagePaths = ExtractImagePaths(c.Front, c.Back),
+            CreatedAt = c.CreatedAt,
+            LastModified = c.LastModified
+        }).ToList();
     }
 }

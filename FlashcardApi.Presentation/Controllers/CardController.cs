@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using FlashcardApi.Application.Card;
 using FlashcardApi.Application.Card.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +28,6 @@ public class CardController : ControllerBase
     public async Task<IActionResult> CreateCard([FromBody] CardDto cardDto)
     {
         var card = await _cardService.CreateCardAsync(cardDto);
-        await _cardService.CleanupUnusedImagesAsync(cardDto.DeskId, cardDto.ImagePaths);
         return Ok(card);
     }
 
@@ -39,7 +37,6 @@ public class CardController : ControllerBase
         try
         {
             var updatedCard = await _cardService.UpdateCardAsync(id, cardDto);
-            await _cardService.CleanupUnusedImagesAsync(cardDto.DeskId, cardDto.ImagePaths);
             return Ok(updatedCard);
         }
         catch (Exception ex)
@@ -51,14 +48,21 @@ public class CardController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCard(string id)
     {
-        try
-        {
-            await _cardService.DeleteCardAsync(id);
-            return Ok(new { message = "Card deleted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var deleted = await _cardService.DeleteCardAsync(id);
+        return deleted ? Ok(new { message = "Card deleted successfully" }) : NotFound(new { message = "Card not found" });
+    }
+
+    [HttpGet("new")]
+    public async Task<IActionResult> GetNewCards([FromQuery] string deskId)
+    {
+        var cards = await _cardService.GetNewCardsAsync(deskId);
+        return Ok(cards);
+    }
+
+    [HttpGet("due-today")]
+    public async Task<IActionResult> GetCardsDueToday([FromQuery] string deskId, [FromQuery] string today)
+    {
+        var cards = await _cardService.GetCardsDueTodayAsync(deskId, today);
+        return Ok(cards);
     }
 }

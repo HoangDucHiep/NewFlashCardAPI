@@ -6,4 +6,7 @@ public class Image
     public string Url { get; set; }
     public string UploadedBy { get; set; }
     public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+
+    // Navigation property
+    public ApplicationUser UploadedByUser { get; set; }
 }

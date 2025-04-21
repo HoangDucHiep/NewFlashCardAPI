@@ -22,7 +22,7 @@ public class SessionService : ISessionService
             StartTime = sessionDto.StartTime,
             EndTime = sessionDto.EndTime,
             CardsStudied = sessionDto.CardsStudied,
-            Performance = sessionDto.Performance,
+            Performance = sessionDto.Performance
         };
         var createdSession = await _sessionRepository.CreateAsync(session);
         return MapToDto(createdSession);
@@ -30,24 +30,22 @@ public class SessionService : ISessionService
 
     public async Task<SessionDto> UpdateSessionAsync(string id, SessionDto sessionDto)
     {
-        var session = await _sessionRepository
-            .GetByDeskIdAsync(sessionDto.DeskId)
+        var session = await _sessionRepository.GetByDeskIdAsync(sessionDto.DeskId)
             .ContinueWith(t => t.Result.FirstOrDefault(s => s.Id == id));
-        if (session == null)
-            throw new Exception("Session not found");
+        if (session == null) throw new Exception("Session not found");
 
         session.StartTime = sessionDto.StartTime;
         session.EndTime = sessionDto.EndTime;
         session.CardsStudied = sessionDto.CardsStudied;
         session.Performance = sessionDto.Performance;
-
         await _sessionRepository.UpdateAsync(session);
+
         return MapToDto(session);
     }
 
-    public async Task DeleteSessionAsync(string id)
+    public async Task<bool> DeleteSessionAsync(string id)
     {
-        await _sessionRepository.DeleteAsync(id);
+        return await _sessionRepository.DeleteAsync(id);
     }
 
     public async Task<List<SessionDto>> GetSessionsByDeskIdAsync(string deskId)
@@ -65,7 +63,7 @@ public class SessionService : ISessionService
             StartTime = session.StartTime,
             EndTime = session.EndTime,
             CardsStudied = session.CardsStudied,
-            Performance = session.Performance,
+            Performance = session.Performance
         };
     }
 }

@@ -19,6 +19,8 @@ Content-Type: application/json
 }
 
 
+
+
 ### Create a desk (to get deskId)
 POST https://localhost:7198/api/desk
 Content-Type: application/json

@@ -41,15 +41,8 @@ public class ReviewController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteReview(string id)
     {
-        try
-        {
-            await _reviewService.DeleteReviewAsync(id);
-            return Ok(new { message = "Review deleted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var deleted = await _reviewService.DeleteReviewAsync(id);
+        return deleted ? Ok(new { message = "Review deleted successfully" }) : NotFound(new { message = "Review not found" });
     }
 
     [HttpGet("card/{cardId}")]
@@ -60,10 +53,7 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("due-today")]
-    public async Task<IActionResult> GetReviewsDueToday(
-        [FromQuery] string deskId,
-        [FromQuery] string today
-    )
+    public async Task<IActionResult> GetReviewsDueToday([FromQuery] string deskId, [FromQuery] string today)
     {
         var reviews = await _reviewService.GetReviewsDueTodayAsync(deskId, today);
         return Ok(reviews);

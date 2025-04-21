@@ -21,17 +21,17 @@ public class ImageRepository : IImageRepository
         return image;
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
         var image = await _context.Images.FindAsync(id);
-        if (image != null)
-        {
-            _context.Images.Remove(image);
-            await _context.SaveChangesAsync();
-        }
+        if (image == null) return false;
+
+        _context.Images.Remove(image);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public async Task<Image> GetByFileNameAsync(string fileName)
+    public async Task<Image?> GetByFileNameAsync(string fileName)
     {
         return await _context.Images.FirstOrDefaultAsync(i => i.Url.EndsWith(fileName));
     }

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FlashcardApi.Application.Folder;
 using FlashcardApi.Application.Folder.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -52,14 +51,15 @@ public class FolderController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFolder(string id)
     {
-        try
-        {
-            await _folderService.DeleteFolderAsync(id);
-            return Ok(new { message = "Folder deleted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var deleted = await _folderService.DeleteFolderAsync(id);
+        return deleted ? Ok(new { message = "Folder deleted successfully" }) : NotFound(new { message = "Folder not found" });
+    }
+
+    [HttpGet("nested")]
+    public async Task<IActionResult> GetNestedFolders()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var nestedFolders = await _folderService.GetNestedFoldersAsync(userId);
+        return Ok(nestedFolders);
     }
 }

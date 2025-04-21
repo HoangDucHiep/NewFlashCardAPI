@@ -28,14 +28,14 @@ public class SessionRepository : ISessionRepository
         return session;
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
         var session = await _context.Sessions.FindAsync(id);
-        if (session != null)
-        {
-            _context.Sessions.Remove(session);
-            await _context.SaveChangesAsync();
-        }
+        if (session == null) return false;
+
+        _context.Sessions.Remove(session);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<List<Session>> GetByDeskIdAsync(string deskId)

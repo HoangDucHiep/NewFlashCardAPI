@@ -8,4 +8,8 @@ public class Card
     public string Back { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
+
+    // Navigation properties
+    public Desk Desk { get; set; }
+    public Review Review { get; set; }
 }

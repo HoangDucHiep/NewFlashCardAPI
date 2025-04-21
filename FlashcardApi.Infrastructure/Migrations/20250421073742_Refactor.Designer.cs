@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlashcardApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250411145501_CardAndImage")]
-    partial class CardAndImage
+    [Migration("20250421073742_Refactor")]
+    partial class Refactor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -138,7 +138,8 @@ namespace FlashcardApi.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FolderId")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
@@ -155,6 +156,8 @@ namespace FlashcardApi.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FolderId");
 
                     b.HasIndex("OwnerId");
 
@@ -202,13 +205,15 @@ namespace FlashcardApi.Infrastructure.Migrations
 
                     b.Property<string>("UploadedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UploadedBy");
 
                     b.ToTable("Images");
                 });
@@ -240,7 +245,8 @@ namespace FlashcardApi.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CardId");
+                    b.HasIndex("CardId")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });
@@ -429,51 +435,83 @@ namespace FlashcardApi.Infrastructure.Migrations
 
             modelBuilder.Entity("FlashcardApi.Domain.Entities.Card", b =>
                 {
-                    b.HasOne("FlashcardApi.Domain.Entities.Desk", null)
-                        .WithMany()
+                    b.HasOne("FlashcardApi.Domain.Entities.Desk", "Desk")
+                        .WithMany("Cards")
                         .HasForeignKey("DeskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Desk");
                 });
 
             modelBuilder.Entity("FlashcardApi.Domain.Entities.Desk", b =>
                 {
-                    b.HasOne("FlashcardApi.Domain.Entities.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
+                    b.HasOne("FlashcardApi.Domain.Entities.Folder", "Folder")
+                        .WithMany("Desks")
+                        .HasForeignKey("FolderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FlashcardApi.Domain.Entities.ApplicationUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Folder");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("FlashcardApi.Domain.Entities.Folder", b =>
                 {
-                    b.HasOne("FlashcardApi.Domain.Entities.ApplicationUser", null)
+                    b.HasOne("FlashcardApi.Domain.Entities.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FlashcardApi.Domain.Entities.Folder", null)
+                    b.HasOne("FlashcardApi.Domain.Entities.Folder", "ParentFolder")
+                        .WithMany("SubFolders")
+                        .HasForeignKey("ParentFolderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("ParentFolder");
+                });
+
+            modelBuilder.Entity("FlashcardApi.Domain.Entities.Image", b =>
+                {
+                    b.HasOne("FlashcardApi.Domain.Entities.ApplicationUser", "UploadedByUser")
                         .WithMany()
-                        .HasForeignKey("ParentFolderId");
+                        .HasForeignKey("UploadedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UploadedByUser");
                 });
 
             modelBuilder.Entity("FlashcardApi.Domain.Entities.Review", b =>
                 {
-                    b.HasOne("FlashcardApi.Domain.Entities.Card", null)
-                        .WithMany()
-                        .HasForeignKey("CardId")
+                    b.HasOne("FlashcardApi.Domain.Entities.Card", "Card")
+                        .WithOne("Review")
+                        .HasForeignKey("FlashcardApi.Domain.Entities.Review", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Card");
                 });
 
             modelBuilder.Entity("FlashcardApi.Domain.Entities.Session", b =>
                 {
-                    b.HasOne("FlashcardApi.Domain.Entities.Desk", null)
-                        .WithMany()
+                    b.HasOne("FlashcardApi.Domain.Entities.Desk", "Desk")
+                        .WithMany("Sessions")
                         .HasForeignKey("DeskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Desk");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -525,6 +563,26 @@ namespace FlashcardApi.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FlashcardApi.Domain.Entities.Card", b =>
+                {
+                    b.Navigation("Review")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FlashcardApi.Domain.Entities.Desk", b =>
+                {
+                    b.Navigation("Cards");
+
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("FlashcardApi.Domain.Entities.Folder", b =>
+                {
+                    b.Navigation("Desks");
+
+                    b.Navigation("SubFolders");
                 });
 #pragma warning restore 612, 618
         }

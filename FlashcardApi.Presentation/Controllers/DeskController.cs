@@ -30,9 +30,7 @@ public class DeskController : ControllerBase
     public async Task<IActionResult> GetDeskById(string id)
     {
         var desk = await _deskService.GetDeskByIdAsync(id);
-        if (desk == null)
-            return NotFound(new { message = "Desk not found" });
-        return Ok(desk);
+        return desk == null ? NotFound(new { message = "Desk not found" }) : Ok(desk);
     }
 
     [HttpGet("public")]
@@ -68,24 +66,17 @@ public class DeskController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDesk(string id)
     {
-        try
-        {
-            await _deskService.DeleteDeskAsync(id);
-            return Ok(new { message = "Desk deleted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var deleted = await _deskService.DeleteDeskAsync(id);
+        return deleted ? Ok(new { message = "Desk deleted successfully" }) : NotFound(new { message = "Desk not found" });
     }
 
     [HttpPost("{id}/clone")]
-    public async Task<IActionResult> CloneDesk(string id)
+    public async Task<IActionResult> CloneDesk(string id, [FromQuery] string targetFolderId)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         try
         {
-            var clonedDesk = await _deskService.CloneDeskAsync(userId, id);
+            var clonedDesk = await _deskService.CloneDeskAsync(userId, id, targetFolderId);
             return Ok(clonedDesk);
         }
         catch (Exception ex)

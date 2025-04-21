@@ -23,7 +23,7 @@ public class ReviewService : IReviewService
             Interval = reviewDto.Interval,
             Repetition = reviewDto.Repetition,
             NextReviewDate = reviewDto.NextReviewDate,
-            LastReviewed = reviewDto.LastReviewed,
+            LastReviewed = reviewDto.LastReviewed
         };
         var createdReview = await _reviewRepository.CreateAsync(review);
         return MapToDto(createdReview);
@@ -32,25 +32,24 @@ public class ReviewService : IReviewService
     public async Task<ReviewDto> UpdateReviewAsync(string id, ReviewDto reviewDto)
     {
         var review = await _reviewRepository.GetByCardIdAsync(reviewDto.CardId);
-        if (review == null || review.Id != id)
-            throw new Exception("Review not found");
+        if (review == null || review.Id != id) throw new Exception("Review not found");
 
         review.Ease = reviewDto.Ease;
         review.Interval = reviewDto.Interval;
         review.Repetition = reviewDto.Repetition;
         review.NextReviewDate = reviewDto.NextReviewDate;
         review.LastReviewed = reviewDto.LastReviewed;
-
         await _reviewRepository.UpdateAsync(review);
+
         return MapToDto(review);
     }
 
-    public async Task DeleteReviewAsync(string id)
+    public async Task<bool> DeleteReviewAsync(string id)
     {
-        await _reviewRepository.DeleteAsync(id);
+        return await _reviewRepository.DeleteAsync(id);
     }
 
-    public async Task<ReviewDto> GetReviewByCardIdAsync(string cardId)
+    public async Task<ReviewDto?> GetReviewByCardIdAsync(string cardId)
     {
         var review = await _reviewRepository.GetByCardIdAsync(cardId);
         return review != null ? MapToDto(review) : null;
@@ -72,7 +71,7 @@ public class ReviewService : IReviewService
             Interval = review.Interval,
             Repetition = review.Repetition,
             NextReviewDate = review.NextReviewDate,
-            LastReviewed = review.LastReviewed,
+            LastReviewed = review.LastReviewed
         };
     }
 }

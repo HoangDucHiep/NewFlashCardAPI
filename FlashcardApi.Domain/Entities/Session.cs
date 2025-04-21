@@ -8,4 +8,7 @@ public class Session
     public string? EndTime { get; set; }
     public int CardsStudied { get; set; }
     public double Performance { get; set; }
+
+    // Navigation property
+    public Desk Desk { get; set; }
 }

@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### Login with the registered user
-POST https://localhost:7198/api/Auth/login
+POST http://0.0.0.0:5029/api/Auth/login
 Content-Type: application/json
 
 {

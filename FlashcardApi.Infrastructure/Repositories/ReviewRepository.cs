@@ -28,30 +28,28 @@ public class ReviewRepository : IReviewRepository
         return review;
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
         var review = await _context.Reviews.FindAsync(id);
-        if (review != null)
-        {
-            _context.Reviews.Remove(review);
-            await _context.SaveChangesAsync();
-        }
+        if (review == null) return false;
+
+        _context.Reviews.Remove(review);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public async Task<Review> GetByCardIdAsync(string cardId)
+    public async Task<Review?> GetByCardIdAsync(string cardId)
     {
         return await _context.Reviews.FirstOrDefaultAsync(r => r.CardId == cardId);
     }
 
     public async Task<List<Review>> GetReviewsDueTodayAsync(string deskId, string today)
     {
-        return await _context
-            .Reviews.Join(
-                _context.Cards,
+        return await _context.Reviews
+            .Join(_context.Cards,
                 r => r.CardId,
                 c => c.Id,
-                (r, c) => new { Review = r, Card = c }
-            )
+                (r, c) => new { Review = r, Card = c })
             .Where(rc => rc.Card.DeskId == deskId && rc.Review.NextReviewDate.CompareTo(today) <= 0)
             .Select(rc => rc.Review)
             .ToListAsync();

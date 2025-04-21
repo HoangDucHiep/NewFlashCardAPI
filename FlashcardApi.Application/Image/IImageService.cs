@@ -5,6 +5,6 @@ namespace FlashcardApi.Application.Image;
 
 public interface IImageService
 {
-    Task<ImageDto> UploadImageAsync(string userId, IFormFile file, string fileName);
-    Task DeleteImageAsync(string fileName);
+    Task<ImageDto> UploadImageAsync(string userId, IFormFile file);
+    Task<bool> DeleteImageAsync(string fileName);
 }

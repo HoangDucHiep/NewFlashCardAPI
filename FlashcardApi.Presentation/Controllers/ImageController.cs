@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FlashcardApi.Application.Image;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,29 +19,19 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("upload")]
-    public async Task<IActionResult> UploadImage(IFormFile file, [FromQuery] string fileName)
+    public async Task<IActionResult> UploadImage(IFormFile file)
     {
-        if (file == null || file.Length == 0)
-            return BadRequest(new { message = "No file uploaded" });
-        if (string.IsNullOrEmpty(fileName))
-            return BadRequest(new { message = "File name is required" });
+        if (file == null || file.Length == 0) return BadRequest(new { message = "No file uploaded" });
 
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var image = await _imageService.UploadImageAsync(userId, file, fileName);
+        var image = await _imageService.UploadImageAsync(userId, file);
         return Ok(image);
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> DeleteImage([FromQuery] string fileName)
+    [HttpDelete("{fileName}")]
+    public async Task<IActionResult> DeleteImage(string fileName)
     {
-        try
-        {
-            await _imageService.DeleteImageAsync(fileName);
-            return Ok(new { message = "Image deleted successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var deleted = await _imageService.DeleteImageAsync(fileName);
+        return deleted ? Ok(new { message = "Image deleted successfully" }) : NotFound(new { message = "Image not found" });
     }
 }

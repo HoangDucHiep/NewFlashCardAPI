@@ -18,41 +18,47 @@ public class ImageService : IImageService
             Directory.CreateDirectory(_storagePath);
     }
 
-    public async Task<ImageDto> UploadImageAsync(string userId, IFormFile file, string fileName)
+    public async Task<ImageDto> UploadImageAsync(string userId, IFormFile file)
     {
-        var filePath = Path.Combine(_storagePath, fileName);
-
+        var filePath = Path.Combine(_storagePath, file.FileName);
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        var image = new Image
-        {
-            Url = $"/Uploads/{fileName}",
-            UploadedBy = userId,
-        };
-        await _imageRepository.AddAsync(image);
+        var image = new Image { Url = $"/Uploads/{file.FileName}", UploadedBy = userId };
+        var createdImage = await _imageRepository.AddAsync(image);
 
         return new ImageDto
         {
-            Id = image.Id,
-            FileName = fileName,
-            Url = image.Url,
-            UploadedAt = image.UploadedAt,
+            Id = createdImage.Id,
+            FileName = file.FileName,
+            Url = createdImage.Url,
+            UploadedAt = createdImage.UploadedAt,
         };
     }
 
-    public async Task DeleteImageAsync(string fileName)
+    public async Task<bool> DeleteImageAsync(string fileName)
     {
-        var image = await _imageRepository.GetByFileNameAsync(fileName); // Cần thêm phương thức này
+        var image = await _imageRepository.GetByFileNameAsync(fileName);
         if (image == null)
-            throw new Exception("Image not found");
+            return false;
 
         var filePath = Path.Combine(_storagePath, fileName);
         if (File.Exists(filePath))
-            File.Delete(filePath);
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                Console.WriteLine($"Không thể xóa file: {ex.Message}");
+                return false; // Hoặc tùy bạn xử lý
+            }
+        }
 
-        await _imageRepository.DeleteAsync(image.Id);
+        return await _imageRepository.DeleteAsync(image.Id);
     }
 }
