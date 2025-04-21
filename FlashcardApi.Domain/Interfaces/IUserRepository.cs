@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 namespace FlashcardApi.Domain.Interfaces
 {
     public interface IUserRepository
-    {
-        Task<ApplicationUser> FindByUsernameAsync(string username);
-        Task<ApplicationUser> FindByIdAsync(string userId);
-    }
+{
+    Task<ApplicationUser> FindByUsernameAsync(string username);
+    Task<ApplicationUser> FindByIdAsync(string userId);
+    Task<ApplicationUser> FindByEmailAsync(string email);
+}
 }

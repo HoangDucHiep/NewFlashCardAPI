@@ -22,4 +22,9 @@ public class UserRepository : IUserRepository
     {
         return await _userManager.FindByIdAsync(userId);
     }
+
+    public async Task<ApplicationUser> FindByEmailAsync(string email)
+    {
+        return await _userManager.FindByEmailAsync(email);
+    }
 }

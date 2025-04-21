@@ -31,13 +31,12 @@ namespace FlashcardApi.Presentation.Controllers
             }
         }
 
-
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] LoginRequestDto request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             try
             {
-                await _authService.RegisterAsync(request.Username, request.Password);
+                await _authService.RegisterAsync(request.Username, request.Email, request.Password);
                 return Ok(new { message = "User registered successfully" });
             }
             catch (Exception ex)
