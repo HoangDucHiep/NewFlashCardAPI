@@ -66,4 +66,9 @@ public class SessionService : ISessionService
             Performance = session.Performance
         };
     }
+
+    public async Task<bool> DeleteAllSessionsByDeskIdAsync(string deskId)
+    {
+        return await _sessionRepository.DeleteAllByDeskIdAsync(deskId);
+    }
 }

@@ -8,4 +8,5 @@ public interface ISessionRepository
     Task<Session> UpdateAsync(Session session);
     Task<bool> DeleteAsync(string id);
     Task<List<Session>> GetByDeskIdAsync(string deskId);
+    Task<bool> DeleteAllByDeskIdAsync(string deskId);
 }

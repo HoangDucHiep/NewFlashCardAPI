@@ -77,6 +77,7 @@ public class CardService : ICardService
         var oldImagePaths = ExtractImagePaths(card.Front, card.Back);
         card.Front = cardDto.Front;
         card.Back = cardDto.Back;
+        card.DeskId = cardDto.DeskId;
         card.LastModified = DateTime.UtcNow;
         await _cardRepository.UpdateAsync(card);
 

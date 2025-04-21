@@ -42,4 +42,14 @@ public class SessionRepository : ISessionRepository
     {
         return await _context.Sessions.Where(s => s.DeskId == deskId).ToListAsync();
     }
+
+    public async Task<bool> DeleteAllByDeskIdAsync(string deskId)
+    {
+        var sessions = await _context.Sessions.Where(s => s.DeskId == deskId).ToListAsync();
+        if (!sessions.Any()) return false;
+
+        _context.Sessions.RemoveRange(sessions);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

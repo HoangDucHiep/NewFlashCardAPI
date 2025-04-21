@@ -45,6 +45,14 @@ public class SessionController : ControllerBase
         return deleted ? Ok(new { message = "Session deleted successfully" }) : NotFound(new { message = "Session not found" });
     }
 
+    [HttpDelete("desk/{deskId}")]
+    public async Task<IActionResult> DeleteAllSessionsByDeskId(string deskId)
+    {
+        var deleted = await _sessionService.DeleteAllSessionsByDeskIdAsync(deskId);
+        return deleted ? Ok(new { message = "All sessions deleted successfully" }) : NotFound(new { message = "No sessions found for desk" });
+    }
+    
+
     [HttpGet("desk/{deskId}")]
     public async Task<IActionResult> GetSessionsByDeskId(string deskId)
     {

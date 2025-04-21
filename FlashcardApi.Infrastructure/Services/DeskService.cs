@@ -69,6 +69,9 @@ public class DeskService : IDeskService
 
     public async Task<DeskDto> CreateDeskAsync(string userId, DeskDto deskDto)
     {
+        if (string.IsNullOrEmpty(deskDto.FolderId))
+            throw new ArgumentException("FolderId is required for creating a desk");
+
         var desk = new Desk
         {
             OwnerId = userId,
@@ -92,6 +95,9 @@ public class DeskService : IDeskService
     {
         var desk = await _deskRepository.GetByIdAsync(id);
         if (desk == null) throw new Exception("Desk not found");
+
+        if (string.IsNullOrEmpty(deskDto.FolderId))
+            throw new ArgumentException("FolderId is required for updating a desk");
 
         desk.Name = deskDto.Name;
         desk.IsPublic = deskDto.IsPublic;
