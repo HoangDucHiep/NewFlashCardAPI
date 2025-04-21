@@ -1,8 +1,9 @@
-using FlashcardApi.Application.ApplicationUser.Dtos;
+using System.Security.Claims;
 using FlashcardApi.Application.ApplicationUser;
+using FlashcardApi.Application.ApplicationUser.Dtos;
+using FlashcardApi.Application.ResetPassword;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace FlashcardApi.Presentation.Controllers
 {
@@ -61,6 +62,34 @@ namespace FlashcardApi.Presentation.Controllers
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             await _authService.LogoutAsync(token);
             return Ok(new { message = "Logged out successfully" });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+        {
+            try
+            {
+                await _authService.RequestPasswordResetAsync(request.Email);
+                return Ok(new { message = "Password reset code sent to your email" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            try
+            {
+                await _authService.ResetPasswordAsync(request.Token, request.NewPassword);
+                return Ok(new { message = "Password reset successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

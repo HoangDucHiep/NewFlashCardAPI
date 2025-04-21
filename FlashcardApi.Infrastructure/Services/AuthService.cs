@@ -5,7 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using FlashcardApi.Application.ApplicationUser;
 using FlashcardApi.Application.ApplicationUser.Dtos;
+using FlashcardApi.Application.Email;
 using FlashcardApi.Domain.Entities;
+using FlashcardApi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,21 +20,28 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly IRevokedTokenRepository _revokedTokenRepository;
 
+    private readonly IEmailService _emailService;
+    private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
+
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IRevokedTokenRepository revokedTokenRepository
+        IRevokedTokenRepository revokedTokenRepository,
+        IEmailService emailService,
+        IPasswordResetTokenRepository passwordResetTokenRepository
     )
     {
         _userManager = userManager;
         _configuration = configuration;
         _revokedTokenRepository = revokedTokenRepository;
+        _emailService = emailService;
+        _passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        
+
         if (user == null)
             throw new Exception("Email does not exist");
 
@@ -145,4 +154,59 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+
+    public async Task RequestPasswordResetAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            throw new Exception("Email does not exist");
+
+        // Tạo mã reset password (6 chữ số ngẫu nhiên)
+        var random = new Random();
+        var resetCode = random.Next(100000, 999999).ToString();
+
+        // Lưu mã vào cơ sở dữ liệu
+        var resetToken = new PasswordResetToken
+        {
+            UserId = user.Id,
+            Token = resetCode,
+            ExpiresAt = DateTime.UtcNow.AddHours(1), // Hết hạn sau 1 giờ
+            IsUsed = false
+        };
+        await _passwordResetTokenRepository.AddAsync(resetToken);
+
+        // Gửi email chứa mã
+        var subject = "Password Reset Request";
+        var body = $"Your password reset code is: {resetCode}\nThis code will expire in 1 hour.";
+        await _emailService.SendEmailAsync(email, subject, body);
+    }
+    
+    public async Task ResetPasswordAsync(string token, string newPassword)
+    {
+        if (!IsValidPassword(newPassword))
+            throw new Exception("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character");
+
+        var resetToken = await _passwordResetTokenRepository.FindByTokenAsync(token);
+        if (resetToken == null)
+            throw new Exception("Invalid or expired reset code");
+
+        var user = await _userManager.FindByIdAsync(resetToken.UserId);
+        if (user == null)
+            throw new Exception("User not found");
+
+        // Đặt lại mật khẩu
+        var resetResult = await _userManager.RemovePasswordAsync(user);
+        if (!resetResult.Succeeded)
+            throw new Exception("Failed to reset password: " + string.Join(", ", resetResult.Errors.Select(e => e.Description)));
+
+        var addPasswordResult = await _userManager.AddPasswordAsync(user, newPassword);
+        if (!addPasswordResult.Succeeded)
+            throw new Exception("Failed to set new password: " + string.Join(", ", addPasswordResult.Errors.Select(e => e.Description)));
+
+        // Đánh dấu mã đã sử dụng
+        resetToken.IsUsed = true;
+        await _passwordResetTokenRepository.UpdateAsync(resetToken);
+    }
+
 }

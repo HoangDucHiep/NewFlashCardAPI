@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using FlashcardApi.Application.ApplicationUser;
 using FlashcardApi.Application.Card;
 using FlashcardApi.Application.Desk;
+using FlashcardApi.Application.Email;
 using FlashcardApi.Application.Folder;
 using FlashcardApi.Application.Image;
 using FlashcardApi.Application.Interfaces;
@@ -73,6 +74,11 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IRevokedTokenRepository, RevokedTokenRepository>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -177,3 +177,6 @@ D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\tr\Microsoft.CodeA
 D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\NewFlashCardAPI\FlashcardApi.Presentation\obj\Debug\net9.0\FlashcardApi.Presentation.sourcelink.json
+D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\MailKit.dll
+D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\MimeKit.dll
+D:\NewFlashCardAPI\FlashcardApi.Presentation\bin\Debug\net9.0\BouncyCastle.Crypto.dll
