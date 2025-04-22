@@ -3,7 +3,7 @@ POST https://localhost:7198/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "testuser",
+    "email": "hunghiephainhuan1412@gmail.com",
     "password": "Password123!"
 }
 
@@ -12,7 +12,7 @@ POST http://0.0.0.0:5029/api/Auth/login
 Content-Type: application/json
 
 {
-    "username": "testuser",
+    "email": "hunghiephainhuan1412@gmail.com",
     "password": "Password123!"
 }
 

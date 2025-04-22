@@ -52,7 +52,15 @@ namespace FlashcardApi.Presentation.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var username = User.FindFirst(ClaimTypes.Name)?.Value;
-            return Ok(new { UserId = userId, Username = username });
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            return Ok(
+                new
+                {
+                    UserId = userId,
+                    Username = username,
+                    Email = email,
+                }
+            );
         }
 
         [Authorize]
